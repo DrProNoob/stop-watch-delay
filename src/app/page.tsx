@@ -5,17 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function StopwatchPage() {
-  const [delay, setDelay] = useState(0);
-  const [time, setTime] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [showStopwatch, setShowStopwatch] = useState(false);
-  const [hideInput, setHideInput] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
+  const [delay, setDelay] = useState(0); // Verzögerung in Minuten
+  const [time, setTime] = useState(0); // Timer-Zeit
+  const [isRunning, setIsRunning] = useState(false); // Timer läuft
+  const [isPaused, setIsPaused] = useState(false); // Timer ist pausiert
+  const [showStopwatch, setShowStopwatch] = useState(false); // Großer Timer sichtbar
+  const [hideInput, setHideInput] = useState(false); // Eingabefeld verstecken
+  const [hasStarted, setHasStarted] = useState(false); // Timer gestartet
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
+    // Wenn der Timer läuft und nicht pausiert ist, erhöhe die Zeit jede Sekunde
     if (isRunning && !isPaused) {
       timer = setInterval(() => setTime((prev) => prev + 1), 1000);
     }
@@ -27,18 +28,24 @@ export default function StopwatchPage() {
     setHideInput(true);
     setHasStarted(true);
 
-    console.log("Timer startet in", delay, "Minuten");
-    
+    console.log("Timer startet sofort!");
+
+    // Starte sofort den kleinen Timer
+    setIsRunning(true);
+
+    // Setze die Verzögerung für die Anzeige des großen Timers
     setTimeout(() => {
       console.log("Großer Timer wird angezeigt");
       setShowStopwatch(true);
-      setIsRunning(true); // Aktiviert auch den kleinen Timer!
 
-      setTimeout(() => {
-        console.log("Großer Timer wird ausgeblendet");
-        setShowStopwatch(false);
-      }, 60 * 1000);
-    }, delay * 60 * 1000);
+      // Der große Timer wird nach 1 Minute wieder ausgeblendet, wenn delay > 0
+      if (delay > 0) {
+        setTimeout(() => {
+          console.log("Großer Timer wird ausgeblendet");
+          setShowStopwatch(false);
+        }, 60 * 1000); // 60 Sekunden
+      }
+    }, delay * 60 * 1000); // Delay in Minuten
   };
 
   const stopTimer = () => {
@@ -62,21 +69,19 @@ export default function StopwatchPage() {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center h-screen bg-zinc-900 text-white">
+    <div className="relative flex items-center justify-center h-screen bg-zinc-900 text-white">
       {/* Großer Timer */}
       {showStopwatch && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-9xl font-bold">{formatTime(time)}</div>
+        <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none mb-9">
+          <div className="text-[15rem] font-bold">{formatTime(time)}</div>
         </div>
       )}
-  
-      {/* Eingabe und Buttons */}
-      <div className={`z-10 ${showStopwatch ? "mt-96" : ""} flex flex-col items-center space-y-4`}>
+
+      <div className="flex flex-col items-center space-y-4 mt-40 z-10 relative">
+        {/* Eingabefeld für die Minuten */}
         {!hideInput && (
           <div className="flex flex-col items-center space-y-2">
-            <label className="text-lg font-medium">
-              Nach wie vielen Minuten soll der Timer angezeigt werden?
-            </label>
+            <label className="text-xl font-medium">Nach wie vielen Minuten soll der Timer eingeblendet werden?</label>
             <Input
               type="number"
               placeholder="Minuten eingeben"
@@ -86,7 +91,9 @@ export default function StopwatchPage() {
             />
           </div>
         )}
-        <div className="space-y-8">
+
+        {/* Buttons für Start/Pause/Stop */}
+        <div className="mt-9">
           {!hasStarted && (
             <Button className="bg-slate-50 text-black" onClick={startTimer}>
               Start
@@ -104,14 +111,14 @@ export default function StopwatchPage() {
           )}
         </div>
       </div>
-  
+
       {/* Kleiner Timer unten links */}
       {isRunning ? (
-        <div className="absolute bottom-4 left-4 text-xl font-bold bg-black/50 px-4 py-2 rounded-lg">
+        <div className="absolute bottom-4 left-4 text-xl font-bold bg-black/50 px-4 py-2 rounded-lg z-20">
           ⏳ {formatTime(time)}
         </div>
       ) : (
-        <div className="absolute bottom-4 left-4 text-gray-500 text-lg">
+        <div className="absolute bottom-4 left-4 text-gray-500 text-lg z-20">
           Timer gestoppt
         </div>
       )}
