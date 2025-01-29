@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 
 export default function StopwatchPage() {
   const [delay, setDelay] = useState(0); // Verzögerung in Minuten
+  const [showDelay, setShowDelay] = useState(0); // Dauer, wie lange der Timer angezeigt werden soll
   const [time, setTime] = useState(0); // Timer-Zeit
   const [isRunning, setIsRunning] = useState(false); // Timer läuft
   const [isPaused, setIsPaused] = useState(false); // Timer ist pausiert
@@ -38,13 +39,11 @@ export default function StopwatchPage() {
       console.log("Großer Timer wird angezeigt");
       setShowStopwatch(true);
 
-      // Der große Timer wird nach 1 Minute wieder ausgeblendet, wenn delay > 0
-      if (delay > 0) {
-        setTimeout(() => {
-          console.log("Großer Timer wird ausgeblendet");
-          setShowStopwatch(false);
-        }, 60 * 1000); // 60 Sekunden
-      }
+      // Der große Timer wird nach der angegebenen Dauer wieder ausgeblendet (showDelay)
+      setTimeout(() => {
+        console.log("Großer Timer wird ausgeblendet");
+        setShowStopwatch(false);
+      }, showDelay * 60 * 1000); // Dauer in Minuten, wie lange der Timer angezeigt wird
     }, delay * 60 * 1000); // Delay in Minuten
   };
 
@@ -87,6 +86,14 @@ export default function StopwatchPage() {
               placeholder="Minuten eingeben"
               value={delay}
               onChange={(e) => setDelay(Number(e.target.value))}
+              className="w-40 text-center bg-zinc-800 text-white border-gray-600"
+            />
+            <label className="text-xl font-medium">Wie lange soll der Timer angezeigt werden?</label>
+            <Input
+              type="number"
+              placeholder="Minuten eingeben"
+              value={showDelay}
+              onChange={(e) => setShowDelay(Number(e.target.value))}
               className="w-40 text-center bg-zinc-800 text-white border-gray-600"
             />
           </div>
